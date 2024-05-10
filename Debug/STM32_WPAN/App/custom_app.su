@@ -1,0 +1,14 @@
+../STM32_WPAN/App/custom_app.c:89:6:Custom_STM_App_Notification	16	static
+../STM32_WPAN/App/custom_app.c:145:6:Custom_APP_Notification	16	static
+../STM32_WPAN/App/custom_app.c:182:6:Custom_APP_Init	8	static
+../STM32_WPAN/App/custom_app.c:193:6:FSVC_MVT_REF_fin	8	static
+../STM32_WPAN/App/custom_app.c:200:6:FSVC_MVT_REF_vide	8	static
+../STM32_WPAN/App/custom_app.c:207:6:FSVC_MVT_REF_validation_succes	8	static
+../STM32_WPAN/App/custom_app.c:214:6:FSVC_MVT_REF_validation_fail	8	static
+../STM32_WPAN/App/custom_app.c:221:6:FSVC_MVT_REF_validation_vide	8	static
+../STM32_WPAN/App/custom_app.c:228:6:FSVC_MVT_vide	8	static
+../STM32_WPAN/App/custom_app.c:235:6:FSVC_MVT_valide	8	static
+../STM32_WPAN/App/custom_app.c:242:6:FSVC_MVT_non_valide	8	static
+../STM32_WPAN/App/custom_app.c:258:6:Custom_Mvt_rep_Update_Char	16	static
+../STM32_WPAN/App/custom_app.c:277:6:Custom_Mvt_rep_Send_Notification	72	static
+../STM32_WPAN/App/custom_app.c:362:6:Custom_Appli_Update_Char	8	static

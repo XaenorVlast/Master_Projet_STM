@@ -1,0 +1,12 @@
+../Drivers/CMSIS/Include/core_cm4.h:2059:26:ITM_SendChar	16	static,ignoring_inline_asm
+../Core/Src/Gestion.c:37:5:_write	32	static
+../Core/Src/Gestion.c:45:6:MX_MEMS_Init	8	static
+../Core/Src/Gestion.c:60:6:MX_MEMS_Process	40	static
+../Core/Src/Gestion.c:145:6:Init_Sensors	8	static
+../Core/Src/Gestion.c:153:6:ReadSensorData	8	static
+../Core/Src/Gestion.c:167:6:CalculateMovementAndSpeed	8	static
+../Core/Src/Gestion.c:175:6:CalibrateSensors	8	static
+../Core/Src/Gestion.c:180:6:CalibrateAccelerometer	40	static
+../Core/Src/Gestion.c:197:6:CalibrateGyroscope	40	static
+../Core/Src/Gestion.c:214:6:recordBenchRep	64	static
+../Core/Src/Gestion.c:290:6:compareBenchReps	24	static
