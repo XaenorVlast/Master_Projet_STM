@@ -286,57 +286,57 @@ void Custom_Mvt_rep_Send_Notification(void) /* Property Notification */
   	  if(Custom_App_Context.rep_status == 1)
   	  {
 
-  		  char rep_ref_fin[] = "finref";
+  		  char rep_ref_fin[] = "finr";
   		 		  memcpy(&NotifyCharData[0], &rep_ref_fin, sizeof(rep_ref_fin));
   		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_fin good \n");
   	  }
   	  if(Custom_App_Context.rep_status == 2)
   		  {
 
-  			  char rep_ref_vide[] = "refvide";
+  			  char rep_ref_vide[] = "refv";
   			 		  memcpy(&NotifyCharData[0], &rep_ref_vide, sizeof(rep_ref_vide));
   			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n");
   		  }
   	  if(Custom_App_Context.rep_status == 3)
   		  {
 
-  			  char validation_succes[] = "valsuc";
+  			  char validation_succes[] = "vals";
   			 		  memcpy(&NotifyCharData[0], &validation_succes, sizeof(validation_succes));
   			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n");
   		  }
   	  if(Custom_App_Context.rep_status == 4)
   		  {
 
-  			  char validation_fail[] = "valfail";
+  			  char validation_fail[] = "valf";
   			 		  memcpy(&NotifyCharData[0], &validation_fail, sizeof(validation_fail));
   			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_fail good \n");
   		  }
   	  if(Custom_App_Context.rep_status == 5)
   		  {
 
-  			  char validation_vide[] = "valvide";
+  			  char validation_vide[] = "valv";
   			 		  memcpy(&NotifyCharData[0], &validation_vide, sizeof(validation_vide));
   			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_vide good \n");
   		  }
   	  if(Custom_App_Context.rep_status == 6)
   		  {
 
-  			  char rep_vide[] = "repvide";
+  			  char rep_vide[] = "repv";
   			 		  memcpy(&NotifyCharData[0], &rep_vide, sizeof(rep_vide));
   			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_vide good \n");
   		  }
   	  if(Custom_App_Context.rep_status == 7)
   			  {
 
-  				  char rep_ref_vide[] = "ahahah";
-  				 		  memcpy(&NotifyCharData[0], &rep_ref_vide, sizeof(rep_ref_vide));
+  				  char rep_valide[] = "ahah";
+  				 		  memcpy(&NotifyCharData[0], &rep_valide, sizeof(rep_valide));
   				 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n");
   			  }
   		  if(Custom_App_Context.rep_status == 8)
   			  {
 
-  				  char validation_succes[] = "ihihih";
-  				 		  memcpy(&NotifyCharData[0], &validation_succes, sizeof(validation_succes));
+  				  char rep_non_valide[] = "ihih";
+  				 		  memcpy(&NotifyCharData[0], &rep_non_valide, sizeof(rep_non_valide));
   				 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n");
   			  }
   	}

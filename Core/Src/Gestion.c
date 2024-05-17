@@ -18,7 +18,7 @@
 #define CALIBRATION_SAMPLES 100
 #define MOVEMENT_THRESHOLD 100 // Seuil de détection de mouvement pour l'accéléromètre
 #define REPETITION_TIME_OUT 2000 // Délai en millisecondes pour déterminer la fin d'une répétition
-#define TOLERANCE 500 // Tolérance pour la comparaison des répétitions
+#define TOLERANCE 600 // Tolérance pour la comparaison des répétitions
 
 // Variables globales
 static MOTION_SENSOR_Axes_t AccValue;
