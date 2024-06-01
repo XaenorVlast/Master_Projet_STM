@@ -34,4 +34,7 @@ bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance);
 int _write(int file, char *ptr, int len);
 
 
+extern ExerciceEtat etat;
+
+
 #endif /* INC_GESTION_H_ */

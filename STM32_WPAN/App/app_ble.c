@@ -717,6 +717,18 @@ void MVT_non_valide(void)
 {
 	FSVC_MVT_non_valide();
 }
+void MVT_BRAS_GAUCHE(void)
+{
+	FSVC_MVT_BRAS_GAUCHE();
+}
+void MVT_BRAS_DROIT(void)
+{
+	FSVC_MVT_BRAS_DROIT();
+}
+void MVT_BRAS_CORRECT(void)
+{
+	FSVC_MVT_BRAS_CORRECT();
+}
 /* USER CODE END FD*/
 
 /*************************************************************

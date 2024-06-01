@@ -37,8 +37,10 @@ typedef struct
 {
   /* Mvt_def */
   uint8_t               Mvt_rep_Notification_Status;
+  uint8_t               Force_Notification_Status;
   /* USER CODE BEGIN CUSTOM_APP_Context_t */
   uint8_t 				rep_status;
+  uint8_t 				bras_status;
   /* USER CODE END CUSTOM_APP_Context_t */
 
   uint16_t              ConnectionHandle;
@@ -80,6 +82,8 @@ uint8_t NotifyCharData[247];
 /* Mvt_def */
 static void Custom_Mvt_rep_Update_Char(void);
 static void Custom_Mvt_rep_Send_Notification(void);
+static void Custom_Force_Update_Char(void);
+static void Custom_Force_Send_Notification(void);
 
 /* USER CODE BEGIN PFP */
 static void Custom_Appli_Update_Char();
@@ -122,6 +126,19 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
     	memcpy(UpdateCharData,pNotification->DataTransfered.pPayload,pNotification->DataTransfered.Length);
     	Custom_Appli_Update_Char();
       /* USER CODE END CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT */
+      break;
+
+    case CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT */
+    	Custom_App_Context.Force_Notification_Status = 1;
+    	Custom_Force_Send_Notification();
+      /* USER CODE END CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT */
+      break;
+
+    case CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT */
+    	Custom_App_Context.Force_Notification_Status = 0;
+      /* USER CODE END CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT */
       break;
 
     case CUSTOM_STM_NOTIFICATION_COMPLETE_EVT:
@@ -183,8 +200,12 @@ void Custom_APP_Init(void)
 {
   /* USER CODE BEGIN CUSTOM_APP_Init */
 	Custom_App_Context.rep_status = 0;
+	Custom_App_Context.bras_status = 0;
 		UTIL_SEQ_RegTask(1<<CFG_TASK_ACC_rep_ID, UTIL_SEQ_RFU, Custom_Mvt_rep_Send_Notification);
+		UTIL_SEQ_RegTask(1<<CFG_TASK_ACC_bras_ID, UTIL_SEQ_RFU, Custom_Force_Send_Notification);
 		Custom_Mvt_rep_Update_Char();
+		Custom_Force_Update_Char();
+
   /* USER CODE END CUSTOM_APP_Init */
   return;
 }
@@ -246,6 +267,29 @@ void FSVC_MVT_non_valide(void)
 
   return;
 }
+void FSVC_MVT_BRAS_GAUCHE(void)
+{
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
+  Custom_App_Context.bras_status = 2;
+
+  return;
+}
+void FSVC_MVT_BRAS_DROIT(void)
+{
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
+  Custom_App_Context.bras_status = 1;
+
+  return;
+}
+void FSVC_MVT_BRAS_CORRECT(void)
+{
+  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
+  Custom_App_Context.bras_status = 3;
+
+  return;
+}
+
+
 /* USER CODE END FD */
 
 /*************************************************************
@@ -354,6 +398,76 @@ void Custom_Mvt_rep_Send_Notification(void) /* Property Notification */
   /* USER CODE BEGIN Mvt_rep_NS_Last*/
 
   /* USER CODE END Mvt_rep_NS_Last*/
+
+  return;
+}
+
+void Custom_Force_Update_Char(void) /* Property Read */
+{
+  uint8_t updateflag = 0;
+
+  /* USER CODE BEGIN Force_UC_1*/
+
+  /* USER CODE END Force_UC_1*/
+
+  if (updateflag != 0)
+  {
+    Custom_STM_App_Update_Char(CUSTOM_STM_FORCE, (uint8_t *)UpdateCharData);
+  }
+
+  /* USER CODE BEGIN Force_UC_Last*/
+
+  /* USER CODE END Force_UC_Last*/
+  return;
+}
+
+void Custom_Force_Send_Notification(void) /* Property Notification */
+{
+  uint8_t updateflag = 0;
+
+  /* USER CODE BEGIN Force_NS_1*/
+  if (Custom_App_Context.Force_Notification_Status == 1)
+  	{
+  	  updateflag = 1;
+
+  	  if(Custom_App_Context.bras_status == 1)
+  	  {
+
+  		  char bras_droit[] = "1";
+  		 		  memcpy(&NotifyCharData[0], &bras_droit, sizeof(bras_droit));
+  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_droit good \n");
+  	  }
+  	  if(Custom_App_Context.bras_status == 2)
+  	  {
+
+  		  char bras_gauche[] = "2";
+  		 		  memcpy(&NotifyCharData[0], &bras_gauche, sizeof(bras_gauche));
+  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_gauche good \n");
+  	  }
+  	if(Custom_App_Context.bras_status == 3)
+  	  	  {
+
+  	  		  char bras_correct[] = "3";
+  	  		 		  memcpy(&NotifyCharData[0], &bras_correct, sizeof(bras_correct));
+  	  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_correct good \n");
+  	  	  }
+
+
+  	}
+	else
+	{
+	  APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n");
+	}
+  /* USER CODE END Force_NS_1*/
+
+  if (updateflag != 0)
+  {
+    Custom_STM_App_Update_Char(CUSTOM_STM_FORCE, (uint8_t *)NotifyCharData);
+  }
+
+  /* USER CODE BEGIN Force_NS_Last*/
+
+  /* USER CODE END Force_NS_Last*/
 
   return;
 }

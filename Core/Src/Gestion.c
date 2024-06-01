@@ -296,4 +296,3 @@ bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance) {
 	}
 	return false;
 }
-

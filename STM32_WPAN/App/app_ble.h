@@ -79,6 +79,9 @@ void MVT_REF_validation_vide(void);
 void MVT_vide(void);
 void MVT_valide(void);
 void MVT_non_valide(void);
+void MVT_BRAS_GAUCHE(void);
+void MVT_BRAS_DROIT(void);
+void MVT_BRAS_CORRECT(void);
 /* USER CODE END EF */
 
 #ifdef __cplusplus
