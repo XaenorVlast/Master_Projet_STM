@@ -37,7 +37,6 @@ typedef enum
   /* Mvt_def */
   CUSTOM_STM_MVT_REP,
   CUSTOM_STM_APPEL_APP,
-  CUSTOM_STM_FORCE,
 } Custom_STM_Char_Opcode_t;
 
 typedef enum
@@ -48,9 +47,6 @@ typedef enum
   /* Appel_app */
   CUSTOM_STM_APPEL_APP_READ_EVT,
   CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT,
-  /* force */
-  CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT,
-  CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT,
   CUSTOM_STM_NOTIFICATION_COMPLETE_EVT,
 
   CUSTOM_STM_BOOT_REQUEST_EVT
@@ -78,7 +74,6 @@ typedef struct
 /* Exported constants --------------------------------------------------------*/
 extern uint8_t SizeMvt_Rep;
 extern uint8_t SizeAppel_App;
-extern uint8_t SizeForce;
 
 /* USER CODE BEGIN EC */
 

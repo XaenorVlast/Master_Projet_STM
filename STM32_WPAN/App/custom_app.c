@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    App/custom_app.c
-  * @author  MCD Application Team
-  * @brief   Custom Example Application (Server)
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    App/custom_app.c
+ * @author  MCD Application Team
+ * @brief   Custom Example Application (Server)
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -33,17 +33,15 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-typedef struct
-{
-  /* Mvt_def */
-  uint8_t               Mvt_rep_Notification_Status;
-  uint8_t               Force_Notification_Status;
-  /* USER CODE BEGIN CUSTOM_APP_Context_t */
-  uint8_t 				rep_status;
-  uint8_t 				bras_status;
-  /* USER CODE END CUSTOM_APP_Context_t */
+typedef struct {
+	/* Mvt_def */
+	uint8_t Mvt_rep_Notification_Status;
+	/* USER CODE BEGIN CUSTOM_APP_Context_t */
+	uint8_t rep_status;
 
-  uint16_t              ConnectionHandle;
+	/* USER CODE END CUSTOM_APP_Context_t */
+
+	uint16_t ConnectionHandle;
 } Custom_App_Context_t;
 
 /* USER CODE BEGIN PTD */
@@ -82,213 +80,190 @@ uint8_t NotifyCharData[247];
 /* Mvt_def */
 static void Custom_Mvt_rep_Update_Char(void);
 static void Custom_Mvt_rep_Send_Notification(void);
-static void Custom_Force_Update_Char(void);
-static void Custom_Force_Send_Notification(void);
 
 /* USER CODE BEGIN PFP */
 static void Custom_Appli_Update_Char();
 /* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
-void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotification)
-{
-  /* USER CODE BEGIN CUSTOM_STM_App_Notification_1 */
+void Custom_STM_App_Notification(
+		Custom_STM_App_Notification_evt_t *pNotification) {
+	/* USER CODE BEGIN CUSTOM_STM_App_Notification_1 */
 
-  /* USER CODE END CUSTOM_STM_App_Notification_1 */
-  switch (pNotification->Custom_Evt_Opcode)
-  {
-    /* USER CODE BEGIN CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
+	/* USER CODE END CUSTOM_STM_App_Notification_1 */
+	switch (pNotification->Custom_Evt_Opcode) {
+	/* USER CODE BEGIN CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
-    /* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
+	/* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
 
-    /* Mvt_def */
-    case CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT */
-    	Custom_App_Context.Mvt_rep_Notification_Status = 1;
-    	    	Custom_Mvt_rep_Send_Notification();
-      /* USER CODE END CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT */
-      break;
+	/* Mvt_def */
+	case CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT:
+		/* USER CODE BEGIN CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT */
+		Custom_App_Context.Mvt_rep_Notification_Status = 1;
+		Custom_Mvt_rep_Send_Notification();
+		/* USER CODE END CUSTOM_STM_MVT_REP_NOTIFY_ENABLED_EVT */
+		break;
 
-    case CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT */
-    	Custom_App_Context.Mvt_rep_Notification_Status = 0;
-      /* USER CODE END CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT */
-      break;
+	case CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT:
+		/* USER CODE BEGIN CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT */
+		Custom_App_Context.Mvt_rep_Notification_Status = 0;
+		/* USER CODE END CUSTOM_STM_MVT_REP_NOTIFY_DISABLED_EVT */
+		break;
 
-    case CUSTOM_STM_APPEL_APP_READ_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_APPEL_APP_READ_EVT */
+	case CUSTOM_STM_APPEL_APP_READ_EVT:
+		/* USER CODE BEGIN CUSTOM_STM_APPEL_APP_READ_EVT */
 
-      /* USER CODE END CUSTOM_STM_APPEL_APP_READ_EVT */
-      break;
+		/* USER CODE END CUSTOM_STM_APPEL_APP_READ_EVT */
+		break;
 
-    case CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT */
-    	memcpy(UpdateCharData,pNotification->DataTransfered.pPayload,pNotification->DataTransfered.Length);
-    	Custom_Appli_Update_Char();
-      /* USER CODE END CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT */
-      break;
+	case CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT:
+		/* USER CODE BEGIN CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT */
+		memcpy(UpdateCharData, pNotification->DataTransfered.pPayload,
+				pNotification->DataTransfered.Length);
+		Custom_Appli_Update_Char();
+		/* USER CODE END CUSTOM_STM_APPEL_APP_WRITE_NO_RESP_EVT */
+		break;
 
-    case CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT */
-    	Custom_App_Context.Force_Notification_Status = 1;
-    	Custom_Force_Send_Notification();
-      /* USER CODE END CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT */
-      break;
+	case CUSTOM_STM_NOTIFICATION_COMPLETE_EVT:
+		/* USER CODE BEGIN CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
 
-    case CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT */
-    	Custom_App_Context.Force_Notification_Status = 0;
-      /* USER CODE END CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT */
-      break;
+		/* USER CODE END CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
+		break;
 
-    case CUSTOM_STM_NOTIFICATION_COMPLETE_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
+	default:
+		/* USER CODE BEGIN CUSTOM_STM_App_Notification_default */
 
-      /* USER CODE END CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
-      break;
+		/* USER CODE END CUSTOM_STM_App_Notification_default */
+		break;
+	}
+	/* USER CODE BEGIN CUSTOM_STM_App_Notification_2 */
 
-    default:
-      /* USER CODE BEGIN CUSTOM_STM_App_Notification_default */
-
-      /* USER CODE END CUSTOM_STM_App_Notification_default */
-      break;
-  }
-  /* USER CODE BEGIN CUSTOM_STM_App_Notification_2 */
-
-  /* USER CODE END CUSTOM_STM_App_Notification_2 */
-  return;
+	/* USER CODE END CUSTOM_STM_App_Notification_2 */
+	return;
 }
 
-void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification)
-{
-  /* USER CODE BEGIN CUSTOM_APP_Notification_1 */
+void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification) {
+	/* USER CODE BEGIN CUSTOM_APP_Notification_1 */
 
-  /* USER CODE END CUSTOM_APP_Notification_1 */
+	/* USER CODE END CUSTOM_APP_Notification_1 */
 
-  switch (pNotification->Custom_Evt_Opcode)
-  {
-    /* USER CODE BEGIN CUSTOM_APP_Notification_Custom_Evt_Opcode */
+	switch (pNotification->Custom_Evt_Opcode) {
+	/* USER CODE BEGIN CUSTOM_APP_Notification_Custom_Evt_Opcode */
 
-    /* USER CODE END P2PS_CUSTOM_Notification_Custom_Evt_Opcode */
-    case CUSTOM_CONN_HANDLE_EVT :
-      /* USER CODE BEGIN CUSTOM_CONN_HANDLE_EVT */
+	/* USER CODE END P2PS_CUSTOM_Notification_Custom_Evt_Opcode */
+	case CUSTOM_CONN_HANDLE_EVT:
+		/* USER CODE BEGIN CUSTOM_CONN_HANDLE_EVT */
 
-      /* USER CODE END CUSTOM_CONN_HANDLE_EVT */
-      break;
+		/* USER CODE END CUSTOM_CONN_HANDLE_EVT */
+		break;
 
-    case CUSTOM_DISCON_HANDLE_EVT :
-      /* USER CODE BEGIN CUSTOM_DISCON_HANDLE_EVT */
+	case CUSTOM_DISCON_HANDLE_EVT:
+		/* USER CODE BEGIN CUSTOM_DISCON_HANDLE_EVT */
 
-      /* USER CODE END CUSTOM_DISCON_HANDLE_EVT */
-      break;
+		/* USER CODE END CUSTOM_DISCON_HANDLE_EVT */
+		break;
 
-    default:
-      /* USER CODE BEGIN CUSTOM_APP_Notification_default */
+	default:
+		/* USER CODE BEGIN CUSTOM_APP_Notification_default */
 
-      /* USER CODE END CUSTOM_APP_Notification_default */
-      break;
-  }
+		/* USER CODE END CUSTOM_APP_Notification_default */
+		break;
+	}
 
-  /* USER CODE BEGIN CUSTOM_APP_Notification_2 */
+	/* USER CODE BEGIN CUSTOM_APP_Notification_2 */
 
-  /* USER CODE END CUSTOM_APP_Notification_2 */
+	/* USER CODE END CUSTOM_APP_Notification_2 */
 
-  return;
+	return;
 }
 
-void Custom_APP_Init(void)
-{
-  /* USER CODE BEGIN CUSTOM_APP_Init */
+void Custom_APP_Init(void) {
+	/* USER CODE BEGIN CUSTOM_APP_Init */
 	Custom_App_Context.rep_status = 0;
-	Custom_App_Context.bras_status = 0;
-		UTIL_SEQ_RegTask(1<<CFG_TASK_ACC_rep_ID, UTIL_SEQ_RFU, Custom_Mvt_rep_Send_Notification);
-		UTIL_SEQ_RegTask(1<<CFG_TASK_ACC_bras_ID, UTIL_SEQ_RFU, Custom_Force_Send_Notification);
-		Custom_Mvt_rep_Update_Char();
-		Custom_Force_Update_Char();
 
-  /* USER CODE END CUSTOM_APP_Init */
-  return;
+	UTIL_SEQ_RegTask(1 << CFG_TASK_ACC_rep_ID, UTIL_SEQ_RFU,
+			Custom_Mvt_rep_Send_Notification);
+
+	Custom_Mvt_rep_Update_Char();
+
+	/* USER CODE END CUSTOM_APP_Init */
+	return;
 }
 
 /* USER CODE BEGIN FD */
-void FSVC_MVT_REF_fin(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 1;
+void FSVC_MVT_REF_fin(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 1;
 
-  return;
+	return;
 }
-void FSVC_MVT_REF_vide(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 2;
+void FSVC_MVT_REF_vide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 2;
 
-  return;
+	return;
 }
-void FSVC_MVT_REF_validation_succes(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 3;
+void FSVC_MVT_REF_validation_succes(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 3;
 
-  return;
+	return;
 }
-void FSVC_MVT_REF_validation_fail(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 4;
+void FSVC_MVT_REF_validation_fail(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 4;
 
-  return;
+	return;
 }
-void FSVC_MVT_REF_validation_vide(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 5;
+void FSVC_MVT_REF_validation_vide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 5;
 
-  return;
+	return;
 }
-void FSVC_MVT_vide(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 6;
+void FSVC_MVT_vide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 6;
 
-  return;
-}
-void FSVC_MVT_valide(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 7;
-
-  return;
-}
-void FSVC_MVT_non_valide(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.rep_status = 8;
-
-  return;
-}
-void FSVC_MVT_BRAS_GAUCHE(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.bras_status = 2;
-
-  return;
-}
-void FSVC_MVT_BRAS_DROIT(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.bras_status = 1;
-
-  return;
-}
-void FSVC_MVT_BRAS_CORRECT(void)
-{
-  UTIL_SEQ_SetTask( 1<<CFG_TASK_ACC_bras_ID, CFG_SCH_PRIO_0);
-  Custom_App_Context.bras_status = 3;
-
-  return;
+	return;
 }
 
+void FSVC_MVT_BRAS_GAUCHE_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 7;
+
+	return;
+}
+void FSVC_MVT_BRAS_DROIT_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 8;
+
+	return;
+}
+void FSVC_MVT_BRAS_CORRECT_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 9;
+
+	return;
+}
+void FSVC_MVT_BRAS_GAUCHE_non_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 10;
+
+	return;
+}
+void FSVC_MVT_BRAS_DROIT_non_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 11;
+
+	return;
+}
+void FSVC_MVT_BRAS_CORRECT_non_valide(void) {
+	UTIL_SEQ_SetTask(1 << CFG_TASK_ACC_rep_ID, CFG_SCH_PRIO_0);
+	Custom_App_Context.rep_status = 12;
+
+	return;
+}
 
 /* USER CODE END FD */
 
@@ -301,181 +276,146 @@ void FSVC_MVT_BRAS_CORRECT(void)
 /* Mvt_def */
 void Custom_Mvt_rep_Update_Char(void) /* Property Read */
 {
-  uint8_t updateflag = 0;
+	uint8_t updateflag = 0;
 
-  /* USER CODE BEGIN Mvt_rep_UC_1*/
+	/* USER CODE BEGIN Mvt_rep_UC_1*/
 
-  /* USER CODE END Mvt_rep_UC_1*/
+	/* USER CODE END Mvt_rep_UC_1*/
 
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_MVT_REP, (uint8_t *)UpdateCharData);
-  }
+	if (updateflag != 0) {
+		Custom_STM_App_Update_Char(CUSTOM_STM_MVT_REP,
+				(uint8_t*) UpdateCharData);
+	}
 
-  /* USER CODE BEGIN Mvt_rep_UC_Last*/
+	/* USER CODE BEGIN Mvt_rep_UC_Last*/
 
-  /* USER CODE END Mvt_rep_UC_Last*/
-  return;
+	/* USER CODE END Mvt_rep_UC_Last*/
+	return;
 }
 
 void Custom_Mvt_rep_Send_Notification(void) /* Property Notification */
 {
-  uint8_t updateflag = 0;
+	uint8_t updateflag = 0;
 
-  /* USER CODE BEGIN Mvt_rep_NS_1*/
-  if (Custom_App_Context.Mvt_rep_Notification_Status == 1)
-  	{
-  	  updateflag = 1;
+	/* USER CODE BEGIN Mvt_rep_NS_1*/
+	if (Custom_App_Context.Mvt_rep_Notification_Status == 1) {
+		updateflag = 1;
 
-  	  if(Custom_App_Context.rep_status == 1)
-  	  {
+		if (Custom_App_Context.rep_status == 1) {
 
-  		  char rep_ref_fin[] = "finr";
-  		 		  memcpy(&NotifyCharData[0], &rep_ref_fin, sizeof(rep_ref_fin));
-  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_fin good \n");
-  	  }
-  	  if(Custom_App_Context.rep_status == 2)
-  		  {
+			char rep_ref_fin[] = "finr";
+			memcpy(&NotifyCharData[0], &rep_ref_fin, sizeof(rep_ref_fin));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_fin good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 2) {
 
-  			  char rep_ref_vide[] = "refv";
-  			 		  memcpy(&NotifyCharData[0], &rep_ref_vide, sizeof(rep_ref_vide));
-  			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n");
-  		  }
-  	  if(Custom_App_Context.rep_status == 3)
-  		  {
+			char rep_ref_vide[] = "refv";
+			memcpy(&NotifyCharData[0], &rep_ref_vide, sizeof(rep_ref_vide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 3) {
 
-  			  char validation_succes[] = "vals";
-  			 		  memcpy(&NotifyCharData[0], &validation_succes, sizeof(validation_succes));
-  			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n");
-  		  }
-  	  if(Custom_App_Context.rep_status == 4)
-  		  {
+			char validation_succes[] = "vals";
+			memcpy(&NotifyCharData[0], &validation_succes,
+					sizeof(validation_succes));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 4) {
 
-  			  char validation_fail[] = "valf";
-  			 		  memcpy(&NotifyCharData[0], &validation_fail, sizeof(validation_fail));
-  			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_fail good \n");
-  		  }
-  	  if(Custom_App_Context.rep_status == 5)
-  		  {
+			char validation_fail[] = "valf";
+			memcpy(&NotifyCharData[0], &validation_fail,
+					sizeof(validation_fail));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_fail good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 5) {
 
-  			  char validation_vide[] = "valv";
-  			 		  memcpy(&NotifyCharData[0], &validation_vide, sizeof(validation_vide));
-  			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_vide good \n");
-  		  }
-  	  if(Custom_App_Context.rep_status == 6)
-  		  {
+			char validation_vide[] = "valv";
+			memcpy(&NotifyCharData[0], &validation_vide,
+					sizeof(validation_vide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_vide good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 6) {
 
-  			  char rep_vide[] = "repv";
-  			 		  memcpy(&NotifyCharData[0], &rep_vide, sizeof(rep_vide));
-  			 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_vide good \n");
-  		  }
-  	  if(Custom_App_Context.rep_status == 7)
-  			  {
+			char rep_vide[] = "repv";
+			memcpy(&NotifyCharData[0], &rep_vide, sizeof(rep_vide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_vide good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 7) {
 
-  				  char rep_valide[] = "ahah";
-  				 		  memcpy(&NotifyCharData[0], &rep_valide, sizeof(rep_valide));
-  				 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n");
-  			  }
-  		  if(Custom_App_Context.rep_status == 8)
-  			  {
+			char BRAS_GAUCHE_valide[] = "Gval";
+			memcpy(&NotifyCharData[0], &BRAS_GAUCHE_valide,
+					sizeof(BRAS_GAUCHE_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT rep_ref_vide good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 8) {
 
-  				  char rep_non_valide[] = "ihih";
-  				 		  memcpy(&NotifyCharData[0], &rep_non_valide, sizeof(rep_non_valide));
-  				 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n");
-  			  }
-  	}
-	else
-	{
-	  APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n");
+			char BRAS_DROIT_valide[] = "Dval";
+			memcpy(&NotifyCharData[0], &BRAS_DROIT_valide,
+					sizeof(BRAS_DROIT_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 9) {
+
+			char BRAS_CORRECT_valide[] = "Cval";
+			memcpy(&NotifyCharData[0], &BRAS_CORRECT_valide,
+					sizeof(BRAS_CORRECT_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 10) {
+
+			char BRAS_GAUCHE_non_valide[] = "Gnva";
+			memcpy(&NotifyCharData[0], &BRAS_GAUCHE_non_valide,
+					sizeof(BRAS_GAUCHE_non_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 11) {
+
+			char BRAS_DROIT_non_valide[] = "Dnva";
+			memcpy(&NotifyCharData[0], &BRAS_DROIT_non_valide,
+					sizeof(BRAS_DROIT_non_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+		if (Custom_App_Context.rep_status == 12) {
+
+			char BRAS_CORRECT_non_valide[] = "Cnva";
+			memcpy(&NotifyCharData[0], &BRAS_CORRECT_non_valide,
+					sizeof(BRAS_CORRECT_non_valide));
+			APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT validation_succes good \n")
+			;
+		}
+	} else {
+		APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n")
+		;
 	}
-  /* USER CODE END Mvt_rep_NS_1*/
+	/* USER CODE END Mvt_rep_NS_1*/
 
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_MVT_REP, (uint8_t *)NotifyCharData);
-  }
-
-  /* USER CODE BEGIN Mvt_rep_NS_Last*/
-
-  /* USER CODE END Mvt_rep_NS_Last*/
-
-  return;
-}
-
-void Custom_Force_Update_Char(void) /* Property Read */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN Force_UC_1*/
-
-  /* USER CODE END Force_UC_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_FORCE, (uint8_t *)UpdateCharData);
-  }
-
-  /* USER CODE BEGIN Force_UC_Last*/
-
-  /* USER CODE END Force_UC_Last*/
-  return;
-}
-
-void Custom_Force_Send_Notification(void) /* Property Notification */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN Force_NS_1*/
-  if (Custom_App_Context.Force_Notification_Status == 1)
-  	{
-  	  updateflag = 1;
-
-  	  if(Custom_App_Context.bras_status == 1)
-  	  {
-
-  		  char bras_droit[] = "1";
-  		 		  memcpy(&NotifyCharData[0], &bras_droit, sizeof(bras_droit));
-  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_droit good \n");
-  	  }
-  	  if(Custom_App_Context.bras_status == 2)
-  	  {
-
-  		  char bras_gauche[] = "2";
-  		 		  memcpy(&NotifyCharData[0], &bras_gauche, sizeof(bras_gauche));
-  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_gauche good \n");
-  	  }
-  	if(Custom_App_Context.bras_status == 3)
-  	  	  {
-
-  	  		  char bras_correct[] = "3";
-  	  		 		  memcpy(&NotifyCharData[0], &bras_correct, sizeof(bras_correct));
-  	  		 		  APP_DBG_MSG("-- CUSTOM APPLICATION SERVER  : INFORM CLIENT bras_correct good \n");
-  	  	  }
-
-
-  	}
-	else
-	{
-	  APP_DBG_MSG("-- CUSTOM APPLICATION : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n");
+	if (updateflag != 0) {
+		Custom_STM_App_Update_Char(CUSTOM_STM_MVT_REP,
+				(uint8_t*) NotifyCharData);
 	}
-  /* USER CODE END Force_NS_1*/
 
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_FORCE, (uint8_t *)NotifyCharData);
-  }
+	/* USER CODE BEGIN Mvt_rep_NS_Last*/
 
-  /* USER CODE BEGIN Force_NS_Last*/
+	/* USER CODE END Mvt_rep_NS_Last*/
 
-  /* USER CODE END Force_NS_Last*/
-
-  return;
+	return;
 }
 
 /* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
 void Custom_Appli_Update_Char()/* Property writed */
 {
-	Custom_STM_App_Update_Char(CUSTOM_STM_APPEL_APP, (uint8_t *)UpdateCharData);
-	  return;
+	Custom_STM_App_Update_Char(CUSTOM_STM_APPEL_APP, (uint8_t*) UpdateCharData);
+	return;
 }
 /* USER CODE END FD_LOCAL_FUNCTIONS*/

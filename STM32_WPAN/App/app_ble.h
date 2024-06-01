@@ -77,11 +77,13 @@ void MVT_REF_validation_succes(void);
 void MVT_REF_validation_fail(void);
 void MVT_REF_validation_vide(void);
 void MVT_vide(void);
-void MVT_valide(void);
-void MVT_non_valide(void);
-void MVT_BRAS_GAUCHE(void);
-void MVT_BRAS_DROIT(void);
-void MVT_BRAS_CORRECT(void);
+
+void MVT_BRAS_GAUCHE_valide(void);
+void MVT_BRAS_DROIT_valide(void);
+void MVT_BRAS_CORRECT_valide(void);
+void MVT_BRAS_GAUCHE_non_valide(void);
+void MVT_BRAS_DROIT_non_valide(void);
+void MVT_BRAS_CORRECT_non_valide(void);
 /* USER CODE END EF */
 
 #ifdef __cplusplus

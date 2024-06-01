@@ -32,7 +32,6 @@ typedef struct{
   uint16_t  CustomMvt_DefHdle;                    /**< Mvt_def handle */
   uint16_t  CustomMvt_RepHdle;                  /**< Mvt_rep handle */
   uint16_t  CustomAppel_AppHdle;                  /**< Appel_app handle */
-  uint16_t  CustomForceHdle;                  /**< force handle */
 /* USER CODE BEGIN Context */
   /* Place holder for Characteristic Descriptors Handle*/
 
@@ -68,7 +67,6 @@ typedef struct{
 /* Private variables ---------------------------------------------------------*/
 uint8_t SizeMvt_Rep = 4;
 uint8_t SizeAppel_App = 1;
-uint8_t SizeForce = 1;
 
 /**
  * START of Section BLE_DRIVER_CONTEXT
@@ -108,7 +106,6 @@ do {\
 #define COPY_MVT_DEF_UUID(uuid_struct)          COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0xcc,0x7a,0x48,0x2a,0x98,0x4a,0x7f,0x2e,0xd5,0xb3,0xe5,0x8f)
 #define COPY_MVT_REP_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0xab,0xcd,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19)
 #define COPY_APPEL_APP_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0x12,0x34,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19)
-#define COPY_FORCE_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0x00,0x00,0x00,0x00,0x8e,0x22,0x45,0x41,0x9d,0x4c,0x21,0xed,0xae,0x82,0xed,0x19)
 
 /* USER CODE BEGIN PF */
 
@@ -188,50 +185,6 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
               break;
             }
           }  /* if (attribute_modified->Attr_Handle == (CustomContext.CustomMvt_RepHdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
-
-          else if (attribute_modified->Attr_Handle == (CustomContext.CustomForceHdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))
-          {
-            return_value = SVCCTL_EvtAckFlowEnable;
-            /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3 */
-
-            /* USER CODE END CUSTOM_STM_Service_1_Char_3 */
-            switch (attribute_modified->Attr_Data[0])
-            {
-              /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_attribute_modified */
-
-              /* USER CODE END CUSTOM_STM_Service_1_Char_3_attribute_modified */
-
-              /* Disabled Notification management */
-              case (!(COMSVC_Notification)):
-                /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_Disabled_BEGIN */
-
-                /* USER CODE END CUSTOM_STM_Service_1_Char_3_Disabled_BEGIN */
-                Notification.Custom_Evt_Opcode = CUSTOM_STM_FORCE_NOTIFY_DISABLED_EVT;
-                Custom_STM_App_Notification(&Notification);
-                /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_Disabled_END */
-
-                /* USER CODE END CUSTOM_STM_Service_1_Char_3_Disabled_END */
-                break;
-
-              /* Enabled Notification management */
-              case COMSVC_Notification:
-                /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_COMSVC_Notification_BEGIN */
-
-                /* USER CODE END CUSTOM_STM_Service_1_Char_3_COMSVC_Notification_BEGIN */
-                Notification.Custom_Evt_Opcode = CUSTOM_STM_FORCE_NOTIFY_ENABLED_EVT;
-                Custom_STM_App_Notification(&Notification);
-                /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_COMSVC_Notification_END */
-
-                /* USER CODE END CUSTOM_STM_Service_1_Char_3_COMSVC_Notification_END */
-                break;
-
-              default:
-                /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_default */
-
-                /* USER CODE END CUSTOM_STM_Service_1_Char_3_default */
-              break;
-            }
-          }  /* if (attribute_modified->Attr_Handle == (CustomContext.CustomForceHdle + CHARACTERISTIC_DESCRIPTOR_ATTRIBUTE_OFFSET))*/
 
           else if (attribute_modified->Attr_Handle == (CustomContext.CustomAppel_AppHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
           {
@@ -339,19 +292,17 @@ void SVCCTL_InitCustomSvc(void)
   /**
    *          Mvt_def
    *
-   * Max_Attribute_Records = 1 + 2*3 + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
+   * Max_Attribute_Records = 1 + 2*2 + 1*no_of_char_with_notify_or_indicate_property + 1*no_of_char_with_broadcast_property
    * service_max_attribute_record = 1 for Mvt_def +
    *                                2 for Mvt_rep +
    *                                2 for Appel_app +
-   *                                2 for force +
    *                                1 for Mvt_rep configuration descriptor +
-   *                                1 for force configuration descriptor +
-   *                              = 9
+   *                              = 6
    *
    * This value doesn't take into account number of descriptors manually added
    * In case of descriptors added, please update the max_attr_record value accordingly in the next SVCCTL_InitService User Section
    */
-  max_attr_record = 9;
+  max_attr_record = 6;
 
   /* USER CODE BEGIN SVCCTL_InitService */
   /* max_attr_record to be updated if descriptors have been added */
@@ -425,32 +376,6 @@ void SVCCTL_InitCustomSvc(void)
   /* Place holder for Characteristic Descriptors */
 
   /* USER CODE END SVCCTL_Init_Service1_Char2 */
-  /**
-   *  force
-   */
-  COPY_FORCE_UUID(uuid.Char_UUID_128);
-  ret = aci_gatt_add_char(CustomContext.CustomMvt_DefHdle,
-                          UUID_TYPE_128, &uuid,
-                          SizeForce,
-                          CHAR_PROP_NOTIFY,
-                          ATTR_PERMISSION_NONE,
-                          GATT_NOTIFY_ATTRIBUTE_WRITE,
-                          0x10,
-                          CHAR_VALUE_LEN_CONSTANT,
-                          &(CustomContext.CustomForceHdle));
-  if (ret != BLE_STATUS_SUCCESS)
-  {
-    APP_DBG_MSG("  Fail   : aci_gatt_add_char command   : FORCE, error code: 0x%x \n\r", ret);
-  }
-  else
-  {
-    APP_DBG_MSG("  Success: aci_gatt_add_char command   : FORCE \n\r");
-  }
-
-  /* USER CODE BEGIN SVCCTL_Init_Service1_Char3/ */
-  /* Place holder for Characteristic Descriptors */
-
-  /* USER CODE END SVCCTL_Init_Service1_Char3 */
 
   /* USER CODE BEGIN SVCCTL_InitCustomSvc_2 */
 
@@ -515,25 +440,6 @@ tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode, uint8
 
 
       /* USER CODE END CUSTOM_STM_App_Update_Service_1_Char_2*/
-      break;
-
-    case CUSTOM_STM_FORCE:
-      ret = aci_gatt_update_char_value(CustomContext.CustomMvt_DefHdle,
-                                       CustomContext.CustomForceHdle,
-                                       0, /* charValOffset */
-                                       SizeForce, /* charValueLen */
-                                       (uint8_t *)  pPayload);
-      if (ret != BLE_STATUS_SUCCESS)
-      {
-        APP_DBG_MSG("  Fail   : aci_gatt_update_char_value FORCE command, result : 0x%x \n\r", ret);
-      }
-      else
-      {
-        APP_DBG_MSG("  Success: aci_gatt_update_char_value FORCE command\n\r");
-      }
-      /* USER CODE BEGIN CUSTOM_STM_App_Update_Service_1_Char_3*/
-
-      /* USER CODE END CUSTOM_STM_App_Update_Service_1_Char_3*/
       break;
 
     default:

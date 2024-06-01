@@ -709,25 +709,30 @@ void MVT_vide(void)
 {
 	FSVC_MVT_vide();
 }
-void MVT_valide(void)
+
+void MVT_BRAS_GAUCHE_valide(void)
 {
-	FSVC_MVT_valide();
+	FSVC_MVT_BRAS_GAUCHE_valide();
 }
-void MVT_non_valide(void)
+void MVT_BRAS_DROIT_valide(void)
 {
-	FSVC_MVT_non_valide();
+	FSVC_MVT_BRAS_DROIT_valide();
 }
-void MVT_BRAS_GAUCHE(void)
+void MVT_BRAS_CORRECT_valide(void)
 {
-	FSVC_MVT_BRAS_GAUCHE();
+	FSVC_MVT_BRAS_CORRECT_valide();
 }
-void MVT_BRAS_DROIT(void)
+void MVT_BRAS_GAUCHE_non_valide(void)
 {
-	FSVC_MVT_BRAS_DROIT();
+	FSVC_MVT_BRAS_GAUCHE_non_valide();
 }
-void MVT_BRAS_CORRECT(void)
+void MVT_BRAS_DROIT_non_valide(void)
 {
-	FSVC_MVT_BRAS_CORRECT();
+	FSVC_MVT_BRAS_DROIT_non_valide();
+}
+void MVT_BRAS_CORRECT_non_valide(void)
+{
+	FSVC_MVT_BRAS_CORRECT_non_valide();
 }
 /* USER CODE END FD*/
 

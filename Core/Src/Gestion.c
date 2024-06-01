@@ -10,7 +10,6 @@
 
 #include"app_ble.h"
 
-
 // Définitions pour la configuration des capteurs
 #define ALGO_FREQ 50U
 #define ACC_ODR ((float)ALGO_FREQ)
@@ -34,7 +33,7 @@ bool fin_seance = false;
 int validMovements = 0;
 int invalidMovements = 0;
 uint32_t zeroForceValue;
-uint32_t attention=0;
+uint32_t attention = 0;
 extern ADC_HandleTypeDef hadc1;
 
 int _write(int file, char *ptr, int len) {
@@ -59,111 +58,135 @@ void MX_MEMS_Init(void) {
 
 }
 
-
 void MX_MEMS_Process() {
-    switch (etat) {
-        case INITIALISATION:
-            // Initialisation des variables
-            validMovements = 0;
-            invalidMovements = 0;
-            MX_MEMS_Init();
-            isExerciseStarted = false;
-            exerciseEnded = false;
-            etat = ATTENTE_DEMARRAGE;
-            break;
+	switch (etat) {
+	case INITIALISATION:
+		// Initialisation des variables
+		validMovements = 0;
+		invalidMovements = 0;
+		MX_MEMS_Init();
+		isExerciseStarted = false;
+		exerciseEnded = false;
+		etat = ATTENTE_DEMARRAGE;
+		break;
 
-        case ATTENTE_DEMARRAGE:
-            // Attente du signal pour démarrer un nouvel exercice
-            if (!isExerciseStarted) {
-                printf("Nouvel exercice détecté, préparation à l'enregistrement...\n");
-                etat = ENREGISTREMENT_REFERENCE;
-            }
-            break;
+	case ATTENTE_DEMARRAGE:
+		// Attente du signal pour démarrer un nouvel exercice
+		if (!isExerciseStarted) {
+			printf(
+					"Nouvel exercice détecté, préparation à l'enregistrement...\n");
+			etat = ENREGISTREMENT_REFERENCE;
+		}
+		break;
 
-        case ENREGISTREMENT_REFERENCE:
-            // Enregistrement du mouvement de référence
-            printf("Enregistrement du mouvement...\n");
-            if (!recordBenchRep(&referenceMovement)) {
-                printf("Aucun mouvement de référence détecté, fin de la tentative.\n");
-                MVT_REF_vide();
-                etat = INITIALISATION;
-            } else {
-                printf("Mouvement de référence enregistré. En attente de validation...\n");
-                MVT_REF_fin();
-                etat = VALIDATION_REFERENCE;
-            }
-            break;
+	case ENREGISTREMENT_REFERENCE:
+		// Enregistrement du mouvement de référence
+		printf("Enregistrement du mouvement...\n");
+		if (!recordBenchRep(&referenceMovement)) {
+			printf(
+					"Aucun mouvement de référence détecté, fin de la tentative.\n");
+			MVT_REF_vide();
+			etat = INITIALISATION;
+		} else {
+			printf(
+					"Mouvement de référence enregistré. En attente de validation...\n");
+			MVT_REF_fin();
+			etat = VALIDATION_REFERENCE;
+		}
+		break;
 
-        case VALIDATION_REFERENCE:
-            // Validation du mouvement de référence
-            printf("Enregistrement du mouvement pour validation...\n");
-            if (!recordBenchRep(&currentMovement)) {
-                printf("Aucun mouvement détecté pour validation, veuillez réessayer.\n");
-                MVT_REF_validation_vide();
-                etat = ENREGISTREMENT_REFERENCE;
-            } else if (compareBenchReps(referenceMovement, currentMovement, TOLERANCE)) {
-                printf("Validation réussie. Commencement des répétitions.\n");
+	case VALIDATION_REFERENCE:
+		// Validation du mouvement de référence
+		printf("Enregistrement du mouvement pour validation...\n");
+		if (!recordBenchRep(&currentMovement)) {
+			printf(
+					"Aucun mouvement détecté pour validation, veuillez réessayer.\n");
+			MVT_REF_validation_vide();
+			etat = ENREGISTREMENT_REFERENCE;
+		} else if (compareBenchReps(referenceMovement, currentMovement,
+		TOLERANCE)) {
+			printf("Validation réussie. Commencement des répétitions.\n");
+
+			MVT_REF_validation_succes();
+			etat = ENREGISTREMENT_REPETITIONS;
+		} else {
+			printf(
+					"Validation échouée, veuillez réenregistrer le mouvement de référence.\n");
+			MVT_REF_validation_fail();
+			etat = ENREGISTREMENT_REFERENCE;
+		}
+		break;
+
+	case ENREGISTREMENT_REPETITIONS:
+		// Enregistrement des répétitions jusqu'à la fin de la série
+		if (!exerciseEnded) {
+			printf("Enregistrement d'une nouvelle répétition...\n");
+			if (!recordBenchRep(&currentMovement)) {
+				printf(
+						"Fin de la série détectée après une période d'inactivité.\n");
+				MVT_vide();
+				exerciseEnded = true;
+				etat = ATTENTE_SERIE;
+			} else if (compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 1) {
+				MVT_BRAS_GAUCHE_valide();
+				validMovements++;
+				printf("Répétition valide.\n");
+
+			} else if (compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 2) {
+				MVT_BRAS_DROIT_valide();
+				validMovements++;
+				printf("Répétition valide.\n");
+
+			} else if (compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 0) {
+				MVT_BRAS_CORRECT_valide();
+				validMovements++;
+				printf("Répétition valide.\n");
+
+			}
 
 
-                MVT_REF_validation_succes();
-                etat = ENREGISTREMENT_REPETITIONS;
-            } else {
-                printf("Validation échouée, veuillez réenregistrer le mouvement de référence.\n");
-                MVT_REF_validation_fail();
-                etat = ENREGISTREMENT_REFERENCE;
-            }
-            break;
+			else if (!compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 1) {
+				MVT_BRAS_GAUCHE_non_valide();
+				invalidMovements++;
+				printf("Répétition non valide.\n");
 
-        case ENREGISTREMENT_REPETITIONS:
-            // Enregistrement des répétitions jusqu'à la fin de la série
-            if (!exerciseEnded) {
-                printf("Enregistrement d'une nouvelle répétition...\n");
-                if (!recordBenchRep(&currentMovement)) {
-                    printf("Fin de la série détectée après une période d'inactivité.\n");
-                    MVT_vide();
-                    exerciseEnded = true;
-                    etat = ATTENTE_SERIE;
-                } else if (compareBenchReps(referenceMovement, currentMovement, TOLERANCE)) {
-                    if(attention==1){
-                    	MVT_BRAS_GAUCHE();
-                    }
-                    if(attention==2){
-                    	MVT_BRAS_DROIT();
-                    }
-                    if(attention==0){
-                    	MVT_BRAS_CORRECT();
-                    }
-                    validMovements++;
-                    printf("Répétition valide.\n");
-                    MVT_valide();
-                } else {
-                    if(attention==1){
-                    	MVT_BRAS_GAUCHE();
-                    }
-                    if(attention==2){
-                    	MVT_BRAS_DROIT();
-                    }
-                    if(attention==0){
-                    	MVT_BRAS_CORRECT();
-                    }
-                    invalidMovements++;
-                    printf("Répétition non valide.\n");
-                    MVT_non_valide();
-                }
-            }
-            break;
 
-        case ATTENTE_SERIE:
-            // Attente d'une nouvelle série
-            if (exerciseEnded) {
-                printf("Prêt pour une nouvelle série.\n");
-                exerciseEnded = false;
-                etat = ENREGISTREMENT_REPETITIONS;
-            }
-            break;
-    }
+
+			} else if (!compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 2) {
+				MVT_BRAS_DROIT_non_valide();
+				invalidMovements++;
+				printf("Répétition non valide.\n");
+
+
+			}
+
+			else if (!compareBenchReps(referenceMovement, currentMovement,
+			TOLERANCE) && attention == 0) {
+				MVT_BRAS_CORRECT_non_valide();
+				invalidMovements++;
+				printf("Répétition non valide.\n");
+
+
+			}
+
+		}
+		break;
+
+	case ATTENTE_SERIE:
+		// Attente d'une nouvelle série
+		if (exerciseEnded) {
+			printf("Prêt pour une nouvelle série.\n");
+			exerciseEnded = false;
+			etat = ENREGISTREMENT_REPETITIONS;
+		}
+		break;
+	}
 }
-
 
 void Init_Sensors(void) {
 	BSP_SENSOR_ACC_Init();
@@ -177,7 +200,7 @@ void ReadSensorData(void) {
 	BSP_SENSOR_ACC_GetAxes(&AccValue);
 	BSP_SENSOR_GYR_GetAxes(&GyrValue);
 
-	// Appliquer le décalage après la calibration
+// Appliquer le décalage après la calibration
 	AccValue.x -= AccOffset.x;
 	AccValue.y -= AccOffset.y;
 	AccValue.z -= AccOffset.z;
@@ -235,90 +258,91 @@ void CalibrateGyroscope(void) {
 }
 
 bool recordBenchRep(BenchRep *rep) {
-    int maxValueZ = INT_MIN;
-    int minValueZ = INT_MAX;
-    uint32_t startTime = HAL_GetTick();
-    uint32_t lastMovementTime = startTime;
-    uint32_t currentTime;
-    bool movementDetected = false;
-    bool isAscending = false; // Initialisation différée
-    int changeOfDirectionCount = 0;
-    bool directionDetermined = false;
-    uint32_t inactivityStartTime = HAL_GetTick(); // Pour détecter l'inactivité initiale
-    zeroForceValue = Get_Calibration_Value();
-    attention=0;
+	int maxValueZ = INT_MIN;
+	int minValueZ = INT_MAX;
+	uint32_t startTime = HAL_GetTick();
+	uint32_t lastMovementTime = startTime;
+	uint32_t currentTime;
+	bool movementDetected = false;
+	bool isAscending = false; // Initialisation différée
+	int changeOfDirectionCount = 0;
+	bool directionDetermined = false;
+	uint32_t inactivityStartTime = HAL_GetTick(); // Pour détecter l'inactivité initiale
+	zeroForceValue = Get_Calibration_Value();
+	attention = 0;
 
+	while (true) {
+		ReadSensorData();
 
-    while (true) {
-        ReadSensorData();
+		// Détecter l'inactivité initiale
+		if (!movementDetected
+				&& (HAL_GetTick() - inactivityStartTime > 15000)) {
+			printf(
+					"Aucun mouvement détecté pendant plus de 15 secondes, fin de la tentative.\n");
+			return false;
+		}
 
+		// Vérifier si le mouvement dépasse le seuil
+		if (abs(AccValue.z) > MOVEMENT_THRESHOLD) {
+			if (!movementDetected) {
+				printf(
+						"Mouvement détecté pour la première fois, début du suivi.\n");
+				movementDetected = true;
+				startTime = HAL_GetTick();
+				lastMovementTime = startTime;
+				inactivityStartTime = 0; // Réinitialiser puisqu'un mouvement a été détecté
+			} else {
+				lastMovementTime = HAL_GetTick();
+			}
 
-        // Détecter l'inactivité initiale
-        if (!movementDetected && (HAL_GetTick() - inactivityStartTime > 15000)) {
-            printf("Aucun mouvement détecté pendant plus de 15 secondes, fin de la tentative.\n");
-            return false;
-        }
+			// Mise à jour des valeurs maximales et minimales
+			maxValueZ = fmax(maxValueZ, AccValue.z);
+			minValueZ = fmin(minValueZ, AccValue.z);
+			uint32_t adcValue = Read_ADC_Value();
+			int32_t adjustedValue = (int32_t) adcValue
+					- (int32_t) zeroForceValue;
 
-        // Vérifier si le mouvement dépasse le seuil
-        if (abs(AccValue.z) > MOVEMENT_THRESHOLD) {
-            if (!movementDetected) {
-                printf("Mouvement détecté pour la première fois, début du suivi.\n");
-                movementDetected = true;
-                startTime = HAL_GetTick();
-                lastMovementTime = startTime;
-                inactivityStartTime = 0; // Réinitialiser puisqu'un mouvement a été détecté
-            } else {
-                lastMovementTime = HAL_GetTick();
-            }
+			if (adjustedValue >= 5) {
+				printf("Attention bras gauche!\n");
+				attention = 1;
+			} else if (adjustedValue <= -5) {
+				printf("Attention bras droit!\n");
+				attention = 2;
+			}
 
-            // Mise à jour des valeurs maximales et minimales
-            maxValueZ = fmax(maxValueZ, AccValue.z);
-            minValueZ = fmin(minValueZ, AccValue.z);
-            uint32_t adcValue = Read_ADC_Value();
-                 int32_t adjustedValue = (int32_t)adcValue - (int32_t)zeroForceValue;
+			// Déterminer la direction du mouvement
+			if (!directionDetermined) {
+				isAscending = AccValue.z > 0;
+				directionDetermined = true;
 
-                 if (adjustedValue >= 3) {
-                          printf("Attention bras gauche!\n");
-                          attention=1;
-                      } else if (adjustedValue <= -3) {
-                          printf("Attention bras droit!\n");
-                          attention=2;
-                      }
+			} else {
+				bool currentAscending = AccValue.z > 0;
+				if (currentAscending != isAscending) {
+					changeOfDirectionCount++;
+					isAscending = currentAscending;
 
-            // Déterminer la direction du mouvement
-            if (!directionDetermined) {
-                isAscending = AccValue.z > 0;
-                directionDetermined = true;
+				}
+			}
+		}
 
-            } else {
-                bool currentAscending = AccValue.z > 0;
-                if (currentAscending != isAscending) {
-                    changeOfDirectionCount++;
-                    isAscending = currentAscending;
+		// Vérifier le temps d'inactivité
+		currentTime = HAL_GetTick();
+		if (movementDetected
+				&& (currentTime - lastMovementTime > REPETITION_TIME_OUT)) {
+			printf(
+					"Période d'inactivité détectée, fin de l'enregistrement du mouvement.\n");
+			break;
+		}
+	}
 
-                }
-            }
-        }
+// Enregistrer les données du mouvement
+	rep->maxAmplitudeZ = maxValueZ;
+	rep->minAmplitudeZ = minValueZ;
+	rep->duration = currentTime - startTime;
+	rep->changeOfDirectionCount = changeOfDirectionCount;
 
-        // Vérifier le temps d'inactivité
-        currentTime = HAL_GetTick();
-        if (movementDetected && (currentTime - lastMovementTime > REPETITION_TIME_OUT)) {
-            printf("Période d'inactivité détectée, fin de l'enregistrement du mouvement.\n");
-            break;
-        }
-    }
-
-    // Enregistrer les données du mouvement
-    rep->maxAmplitudeZ = maxValueZ;
-    rep->minAmplitudeZ = minValueZ;
-    rep->duration = currentTime - startTime;
-    rep->changeOfDirectionCount = changeOfDirectionCount;
-
-
-
-    return true; // Mouvement détecté et enregistré
+	return true; // Mouvement détecté et enregistré
 }
-
 
 bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance) {
 	if (abs(refRep.maxAmplitudeZ - newRep.maxAmplitudeZ) <= tolerance
@@ -331,18 +355,18 @@ bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance) {
 }
 
 uint32_t Read_ADC_Value(void) {
-    HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-    uint32_t adcValue = HAL_ADC_GetValue(&hadc1);
-    HAL_ADC_Stop(&hadc1);
-    return adcValue;
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	uint32_t adcValue = HAL_ADC_GetValue(&hadc1);
+	HAL_ADC_Stop(&hadc1);
+	return adcValue;
 }
 uint32_t Get_Calibration_Value(void) {
-    uint32_t sum = 0;
-    const int numSamples = 10;
-    for (int i = 0; i < numSamples; i++) {
-        sum += Read_ADC_Value();
-        HAL_Delay(10);  // Delay to allow ADC to stabilize
-    }
-    return sum / numSamples;
+	uint32_t sum = 0;
+	const int numSamples = 10;
+	for (int i = 0; i < numSamples; i++) {
+		sum += Read_ADC_Value();
+		HAL_Delay(10);  // Delay to allow ADC to stabilize
+	}
+	return sum / numSamples;
 }
