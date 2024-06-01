@@ -32,7 +32,8 @@ void CalibrateGyroscope(void);
 bool recordBenchRep(BenchRep *rep);
 bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance);
 int _write(int file, char *ptr, int len);
-
+uint32_t Read_ADC_Value(void);
+uint32_t Get_Calibration_Value(void);
 
 extern ExerciceEtat etat;
 

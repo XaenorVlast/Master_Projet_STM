@@ -33,6 +33,9 @@ bool exerciseEnded = false;
 bool fin_seance = false;
 int validMovements = 0;
 int invalidMovements = 0;
+uint32_t zeroForceValue;
+uint32_t attention=0;
+extern ADC_HandleTypeDef hadc1;
 
 int _write(int file, char *ptr, int len) {
 	int DataIdx;
@@ -100,6 +103,8 @@ void MX_MEMS_Process() {
                 etat = ENREGISTREMENT_REFERENCE;
             } else if (compareBenchReps(referenceMovement, currentMovement, TOLERANCE)) {
                 printf("Validation réussie. Commencement des répétitions.\n");
+
+
                 MVT_REF_validation_succes();
                 etat = ENREGISTREMENT_REPETITIONS;
             } else {
@@ -119,10 +124,28 @@ void MX_MEMS_Process() {
                     exerciseEnded = true;
                     etat = ATTENTE_SERIE;
                 } else if (compareBenchReps(referenceMovement, currentMovement, TOLERANCE)) {
+                    if(attention==1){
+                    	MVT_BRAS_GAUCHE();
+                    }
+                    if(attention==2){
+                    	MVT_BRAS_DROIT();
+                    }
+                    if(attention==0){
+                    	MVT_BRAS_CORRECT();
+                    }
                     validMovements++;
                     printf("Répétition valide.\n");
                     MVT_valide();
                 } else {
+                    if(attention==1){
+                    	MVT_BRAS_GAUCHE();
+                    }
+                    if(attention==2){
+                    	MVT_BRAS_DROIT();
+                    }
+                    if(attention==0){
+                    	MVT_BRAS_CORRECT();
+                    }
                     invalidMovements++;
                     printf("Répétition non valide.\n");
                     MVT_non_valide();
@@ -222,7 +245,8 @@ bool recordBenchRep(BenchRep *rep) {
     int changeOfDirectionCount = 0;
     bool directionDetermined = false;
     uint32_t inactivityStartTime = HAL_GetTick(); // Pour détecter l'inactivité initiale
-
+    zeroForceValue = Get_Calibration_Value();
+    attention=0;
 
 
     while (true) {
@@ -250,7 +274,16 @@ bool recordBenchRep(BenchRep *rep) {
             // Mise à jour des valeurs maximales et minimales
             maxValueZ = fmax(maxValueZ, AccValue.z);
             minValueZ = fmin(minValueZ, AccValue.z);
+            uint32_t adcValue = Read_ADC_Value();
+                 int32_t adjustedValue = (int32_t)adcValue - (int32_t)zeroForceValue;
 
+                 if (adjustedValue >= 3) {
+                          printf("Attention bras gauche!\n");
+                          attention=1;
+                      } else if (adjustedValue <= -3) {
+                          printf("Attention bras droit!\n");
+                          attention=2;
+                      }
 
             // Déterminer la direction du mouvement
             if (!directionDetermined) {
@@ -295,4 +328,21 @@ bool compareBenchReps(BenchRep refRep, BenchRep newRep, int tolerance) {
 		return true;
 	}
 	return false;
+}
+
+uint32_t Read_ADC_Value(void) {
+    HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+    uint32_t adcValue = HAL_ADC_GetValue(&hadc1);
+    HAL_ADC_Stop(&hadc1);
+    return adcValue;
+}
+uint32_t Get_Calibration_Value(void) {
+    uint32_t sum = 0;
+    const int numSamples = 10;
+    for (int i = 0; i < numSamples; i++) {
+        sum += Read_ADC_Value();
+        HAL_Delay(10);  // Delay to allow ADC to stabilize
+    }
+    return sum / numSamples;
 }
