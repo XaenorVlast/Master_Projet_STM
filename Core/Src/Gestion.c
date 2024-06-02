@@ -302,12 +302,12 @@ bool recordBenchRep(BenchRep *rep) {
 			int32_t adjustedValue = (int32_t) adcValue
 					- (int32_t) zeroForceValue;
 
-			if (adjustedValue >= 5) {
-				printf("Attention bras gauche!\n");
-				attention = 1;
-			} else if (adjustedValue <= -5) {
+			if (adjustedValue >= 3) {
 				printf("Attention bras droit!\n");
 				attention = 2;
+			} else if (adjustedValue <= -3) {
+				printf("Attention bras gauche!\n");
+				attention = 1;
 			}
 
 			// Déterminer la direction du mouvement

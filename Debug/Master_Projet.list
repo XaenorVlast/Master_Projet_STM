@@ -2097,28 +2097,28 @@ bool recordBenchRep(BenchRep *rep) {
  800138a:	1a9b      	subs	r3, r3, r2
  800138c:	613b      	str	r3, [r7, #16]
 
-			if (adjustedValue >= 5) {
+			if (adjustedValue >= 3) {
  800138e:	693b      	ldr	r3, [r7, #16]
- 8001390:	2b04      	cmp	r3, #4
+ 8001390:	2b02      	cmp	r3, #2
  8001392:	dd06      	ble.n	80013a2 <recordBenchRep+0x142>
-				printf("Attention bras gauche!\n");
+				printf("Attention bras droit!\n");
  8001394:	4832      	ldr	r0, [pc, #200]	@ (8001460 <recordBenchRep+0x200>)
  8001396:	f011 fc6d 	bl	8012c74 <puts>
-				attention = 1;
+				attention = 2;
  800139a:	4b2d      	ldr	r3, [pc, #180]	@ (8001450 <recordBenchRep+0x1f0>)
- 800139c:	2201      	movs	r2, #1
+ 800139c:	2202      	movs	r2, #2
  800139e:	601a      	str	r2, [r3, #0]
  80013a0:	e009      	b.n	80013b6 <recordBenchRep+0x156>
-			} else if (adjustedValue <= -5) {
+			} else if (adjustedValue <= -3) {
  80013a2:	693b      	ldr	r3, [r7, #16]
- 80013a4:	f113 0f04 	cmn.w	r3, #4
+ 80013a4:	f113 0f02 	cmn.w	r3, #2
  80013a8:	da05      	bge.n	80013b6 <recordBenchRep+0x156>
-				printf("Attention bras droit!\n");
+				printf("Attention bras gauche!\n");
  80013aa:	482e      	ldr	r0, [pc, #184]	@ (8001464 <recordBenchRep+0x204>)
  80013ac:	f011 fc62 	bl	8012c74 <puts>
-				attention = 2;
+				attention = 1;
  80013b0:	4b27      	ldr	r3, [pc, #156]	@ (8001450 <recordBenchRep+0x1f0>)
- 80013b2:	2202      	movs	r2, #2
+ 80013b2:	2201      	movs	r2, #1
  80013b4:	601a      	str	r2, [r3, #0]
 			}
 
